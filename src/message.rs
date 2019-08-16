@@ -12,7 +12,7 @@ const FIXED_PARAM_IDS: [&'static str; 3] = [COMMAND_TEMPLATE_PARAM_ID, EXEC_DIR_
 
 pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let job = Job::new(message)?;
-  debug!("reveived message: {:?}", job);
+  debug!("Received message: {:?}", job);
 
   match job.check_requirements() {
     Ok(_) => {}
@@ -48,7 +48,7 @@ fn launch(command: &str, lib_path: Vec<String>, exec_dir: Option<String>) {
 
 #[test]
 pub fn test_compile_command_template() {
-  let mut command_template = "ls {option} {path}".to_string();
+  let command_template = "ls {option} {path}".to_string();
   let mut parameters = HashMap::new();
   parameters.insert("option".to_string(), Some("-l".to_string()));
   parameters.insert("path".to_string(), Some(".".to_string()));
@@ -59,7 +59,7 @@ pub fn test_compile_command_template() {
 
 #[test]
 pub fn test_compile_command_template_with_fixed_params() {
-  let mut command_template = "ls {option} {path}".to_string();
+  let command_template = "ls {option} {path}".to_string();
   let mut parameters = HashMap::new();
   parameters.insert("option".to_string(), Some("-l".to_string()));
   parameters.insert("path".to_string(), Some(".".to_string()));
