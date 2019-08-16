@@ -19,11 +19,7 @@ const LD_LIBRARY_PATH: &'static str = "LD_LIBRARY_PATH";
 pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let job = Job::new(message)?;
   debug!("Received message: {:?}", job);
-
-  match job.check_requirements() {
-    Ok(_) => {}
-    Err(message) => { return Err(message); }
-  }
+  job.check_requirements()?;
 
   let lib_path = job.get_array_of_strings_parameter(LIBRARIES_PARAM_ID).unwrap_or(vec![]);
   let exec_dir = job.get_string_parameter(EXEC_DIR_PARAM_ID);
@@ -46,7 +42,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
 }
 
 fn compile_command_template(command_template: String, param_map: HashMap<String, Option<String>>) -> String {
-  let mut compiled_command_template = command_template.clone();
+  let mut compiled_command_template = command_template;
   param_map.iter()
     .filter(|(key, _value)| !FIXED_PARAM_IDS.contains(&key.as_str()))
     .filter(|(_key, value)| value.is_some())
