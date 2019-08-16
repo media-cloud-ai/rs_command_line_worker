@@ -67,7 +67,7 @@ dependencies = [
 
 [[package]]
 name = "amqp_worker"
-version = "0.5.7"
+version = "0.5.8"
 dependencies = [
  "amq-protocol-types 2.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "amq-protocol-uri 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1273,7 +1273,7 @@ dependencies = [
 name = "rs_command_line_worker"
 version = "0.1.0"
 dependencies = [
- "amqp_worker 0.5.7",
+ "amqp_worker 0.5.8",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

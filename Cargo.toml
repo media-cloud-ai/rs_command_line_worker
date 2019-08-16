@@ -5,5 +5,5 @@ authors = ["Valentin NOEL <valentin.noel@media-io.com>"]
 edition = "2018"
 
 [dependencies]
-amqp_worker = { path = "../rs_amqp_worker" }
+amqp_worker = "0.5.8"
 log = "0.4.5"
