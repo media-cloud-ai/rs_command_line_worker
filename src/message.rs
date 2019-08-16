@@ -24,7 +24,11 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let lib_path = job.get_array_of_strings_parameter(LIBRARIES_PARAM_ID).unwrap_or(vec![]);
   let exec_dir = job.get_string_parameter(EXEC_DIR_PARAM_ID);
   let command_template = job.get_string_parameter(COMMAND_TEMPLATE_PARAM_ID)
-    .ok_or(MessageError::RuntimeError(format!("Invalid job message: missing expected '{}' parameter.", COMMAND_TEMPLATE_PARAM_ID)))?;
+    .ok_or(MessageError::ProcessingError(
+      JobResult::from(&job)
+        .with_status(JobStatus::Error)
+        .with_message(format!("Invalid job message: missing expected '{}' parameter.", COMMAND_TEMPLATE_PARAM_ID))
+    ))?;
 
   let param_map: HashMap<String, Option<String>> = job.get_parameters_as_map();
   let command = compile_command_template(command_template, param_map);
