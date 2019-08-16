@@ -11,7 +11,11 @@ const COMMAND_TEMPLATE_PARAM_ID: &'static str = "command_template";
 const EXEC_DIR_PARAM_ID: &'static str = "exec_dir";
 const LIBRARIES_PARAM_ID: &'static str = "libraries";
 
-const FIXED_PARAM_IDS: [&'static str; 3] = [COMMAND_TEMPLATE_PARAM_ID, EXEC_DIR_PARAM_ID, LIBRARIES_PARAM_ID];
+const INTERNAL_PARAM_IDS: [&'static str; 3] = [
+  COMMAND_TEMPLATE_PARAM_ID,
+  EXEC_DIR_PARAM_ID,
+  LIBRARIES_PARAM_ID
+];
 
 const LD_LIBRARY_PATH: &'static str = "LD_LIBRARY_PATH";
 
@@ -48,7 +52,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
 fn compile_command_template(command_template: String, param_map: HashMap<String, Option<String>>) -> String {
   let mut compiled_command_template = command_template;
   param_map.iter()
-    .filter(|(key, _value)| !FIXED_PARAM_IDS.contains(&key.as_str()))
+    .filter(|(key, _value)| !INTERNAL_PARAM_IDS.contains(&key.as_str()))
     .filter(|(_key, value)| value.is_some())
     .for_each(|(key, value)|
       compiled_command_template = compiled_command_template.replace(format!("{{{}}}", key).as_str(), value.clone().unwrap().as_str()));
