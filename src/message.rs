@@ -55,7 +55,10 @@ fn compile_command_template(command_template: String, param_map: HashMap<String,
     .filter(|(key, _value)| !INTERNAL_PARAM_IDS.contains(&key.as_str()))
     .filter(|(_key, value)| value.is_some())
     .for_each(|(key, value)|
-      compiled_command_template = compiled_command_template.replace(format!("{{{}}}", key).as_str(), value.clone().unwrap().as_str()));
+      if let Some(v) = value {
+        compiled_command_template = compiled_command_template.replace(&format!("{{{}}}", key), v.as_str())
+      }
+    );
   compiled_command_template
 }
 
