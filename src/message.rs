@@ -101,6 +101,17 @@ pub fn test_compile_command_template() {
 }
 
 #[test]
+pub fn test_compile_command_template_with_doubles() {
+  let command_template = "ls {option} {path} {option}".to_string();
+  let mut parameters = HashMap::new();
+  parameters.insert("option".to_string(), Some("-l".to_string()));
+  parameters.insert("path".to_string(), Some(".".to_string()));
+
+  let command = compile_command_template(command_template, parameters);
+  assert_eq!("ls -l . -l", command.as_str());
+}
+
+#[test]
 pub fn test_compile_command_template_with_fixed_params() {
   let command_template = "ls {option} {path}".to_string();
   let mut parameters = HashMap::new();
