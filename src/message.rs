@@ -7,23 +7,17 @@ use amqp_worker::MessageError;
 
 const COMMAND_TEMPLATE_PARAM_ID: &'static str = "command_template";
 const EXEC_DIR_PARAM_ID: &'static str = "exec_dir";
-const LIBRARIES_PARAM_ID: &'static str = "libraries";
 
-const INTERNAL_PARAM_IDS: [&'static str; 3] = [
+const INTERNAL_PARAM_IDS: [&'static str; 2] = [
   COMMAND_TEMPLATE_PARAM_ID,
-  EXEC_DIR_PARAM_ID,
-  LIBRARIES_PARAM_ID
+  EXEC_DIR_PARAM_ID
 ];
-
-const LD_LIBRARY_PATH: &'static str = "LD_LIBRARY_PATH";
-
 
 pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let job = Job::new(message)?;
   debug!("Received message: {:?}", job);
   job.check_requirements()?;
 
-  let lib_path = job.get_array_of_strings_parameter(LIBRARIES_PARAM_ID).unwrap_or(vec![]);
   let exec_dir = job.get_string_parameter(EXEC_DIR_PARAM_ID);
   let command_template = job.get_string_parameter(COMMAND_TEMPLATE_PARAM_ID)
     .ok_or(MessageError::ProcessingError(
@@ -35,7 +29,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let param_map: HashMap<String, Option<String>> = job.get_parameters_as_map();
   let command = compile_command_template(command_template, param_map);
 
-  let result = launch(command, lib_path, exec_dir)
+  let result = launch(command, exec_dir)
     .map_err(|msg|
       MessageError::ProcessingError(
         JobResult::from(&job)
@@ -60,20 +54,11 @@ fn compile_command_template(command_template: String, param_map: HashMap<String,
   compiled_command_template
 }
 
-fn get_library_path(lib_path: Vec<String>) -> String {
-  format!("{}:{}", lib_path.join(":"), std::env::var(LD_LIBRARY_PATH).unwrap_or_default())
-}
-
-fn launch(command: String, lib_path: Vec<String>, exec_dir: Option<String>) -> Result<String, String> {
+fn launch(command: String, exec_dir: Option<String>) -> Result<String, String> {
   let mut command_elems: Vec<&str> = command.split(" ").collect();
   let program = command_elems.remove(0);
 
   let mut process = Command::new(program);
-
-  if !lib_path.is_empty() {
-    // FIXME: Env var should be generic
-    process.env(LD_LIBRARY_PATH, get_library_path(lib_path).as_str());
-  }
 
   if let Some(current_dir) = exec_dir {
     process.current_dir(Path::new(current_dir.as_str()));
@@ -117,25 +102,16 @@ pub fn test_compile_command_template_with_fixed_params() {
   parameters.insert("path".to_string(), Some(".".to_string()));
   parameters.insert(COMMAND_TEMPLATE_PARAM_ID.to_string(), Some(command_template.clone()));
   parameters.insert(EXEC_DIR_PARAM_ID.to_string(), Some("/path/to/somewhere".to_string()));
-  parameters.insert(LIBRARIES_PARAM_ID.to_string(), Some("/path/to/lib".to_string()));
 
   let command = compile_command_template(command_template, parameters);
   assert_eq!("ls -l .", command.as_str());
 }
 
 #[test]
-pub fn test_get_library_path() {
-  let lib_path = vec!["/path/to/lib".to_string(), "/path/to/other/lib".to_string()];
-  let library_path = get_library_path(lib_path);
-  assert!(library_path.starts_with("/path/to/lib:/path/to/other/lib"));
-}
-
-#[test]
 pub fn test_launch() {
   let command = "ls .".to_string();
-  let lib_path = vec![];
   let exec_dir = None;
-  let result = launch(command, lib_path, exec_dir);
+  let result = launch(command, exec_dir);
   assert!(result.is_ok());
 
   let program_output = result.unwrap();
@@ -146,9 +122,8 @@ pub fn test_launch() {
 #[test]
 pub fn test_launch_with_exec_dir() {
   let command = "ls .".to_string();
-  let lib_path = vec![];
   let exec_dir = Some("./src".to_string());
-  let result = launch(command, lib_path, exec_dir);
+  let result = launch(command, exec_dir);
   assert!(result.is_ok());
 
   let program_output = result.unwrap();
@@ -180,14 +155,6 @@ pub fn test_process() {
         "id": "exec_dir",
         "type": "string",
         "value": "./src"
-      },
-      {
-        "id": "libraries",
-        "type": "array_of_strings",
-        "value": [
-          "/path/to/lib",
-          "/path/to/other/lib"
-        ]
       }
     ]
   }"#;
