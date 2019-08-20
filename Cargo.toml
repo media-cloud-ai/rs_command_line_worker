@@ -1,7 +1,10 @@
 [package]
-name = "rs_command_line_worker"
+name = "command_line_worker"
 version = "0.1.0"
-authors = ["Valentin NOEL <valentin.noel@media-io.com>"]
+authors = [
+  "Valentin Noel <valentin.noel@media-io.com>",
+  "Marc-Antoine Arnaud <maarnaud@media-io.com>"
+]
 edition = "2018"
 
 [dependencies]

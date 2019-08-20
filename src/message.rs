@@ -2,16 +2,15 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::process::Command;
 
-use amqp_worker::job::*;
-use amqp_worker::MessageError;
+use amqp_worker::{
+  job::{Job, JobResult, JobStatus, ParametersContainer},
+  MessageError,
+};
 
 const COMMAND_TEMPLATE_PARAM_ID: &str = "command_template";
 const EXEC_DIR_PARAM_ID: &str = "exec_dir";
 
-const INTERNAL_PARAM_IDS: [&str; 2] = [
-  COMMAND_TEMPLATE_PARAM_ID,
-  EXEC_DIR_PARAM_ID
-];
+const INTERNAL_PARAM_IDS: [&str; 2] = [COMMAND_TEMPLATE_PARAM_ID, EXEC_DIR_PARAM_ID];
 
 pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let job = Job::new(message)?;
@@ -19,35 +18,48 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   job.check_requirements()?;
 
   let exec_dir = job.get_string_parameter(EXEC_DIR_PARAM_ID);
-  let command_template = job.get_string_parameter(COMMAND_TEMPLATE_PARAM_ID)
-    .ok_or_else(|| MessageError::ProcessingError(
-      JobResult::from(&job)
-        .with_status(JobStatus::Error)
-        .with_message(format!("Invalid job message: missing expected '{}' parameter.", COMMAND_TEMPLATE_PARAM_ID))
-    ))?;
+  let command_template = job
+    .get_string_parameter(COMMAND_TEMPLATE_PARAM_ID)
+    .ok_or_else(|| {
+      MessageError::ProcessingError(
+        JobResult::from(&job)
+          .with_status(JobStatus::Error)
+          .with_message(format!(
+            "Invalid job message: missing expected '{}' parameter.",
+            COMMAND_TEMPLATE_PARAM_ID
+          )),
+      )
+    })?;
 
   let param_map = job.get_parameters_as_map();
   let command = compile_command_template(command_template, param_map);
 
-  let result = launch(command, exec_dir)
-    .map_err(|msg|
-      MessageError::ProcessingError(
-        JobResult::from(&job)
-          .with_status(JobStatus::Error)
-          .with_message(msg)
-      )
-    )?;
+  let result = launch(command, exec_dir).map_err(|msg| {
+    MessageError::ProcessingError(
+      JobResult::from(&job)
+        .with_status(JobStatus::Error)
+        .with_message(msg),
+    )
+  })?;
 
-  Ok(JobResult::from(job).with_status(JobStatus::Completed).with_message(result))
+  Ok(
+    JobResult::from(job)
+      .with_status(JobStatus::Completed)
+      .with_message(result),
+  )
 }
 
-fn compile_command_template(command_template: String, param_map: HashMap<String, String>) -> String {
+fn compile_command_template(
+  command_template: String,
+  param_map: HashMap<String, String>,
+) -> String {
   let mut compiled_command_template = command_template;
-  param_map.iter()
+  param_map
+    .iter()
     .filter(|(key, _value)| !INTERNAL_PARAM_IDS.contains(&key.as_str()))
-    .for_each(|(key, value)|
+    .for_each(|(key, value)| {
       compiled_command_template = compiled_command_template.replace(&format!("{{{}}}", key), value)
-    );
+    });
   compiled_command_template
 }
 
@@ -67,7 +79,12 @@ fn launch(command: String, exec_dir: Option<String>) -> Result<String, String> {
   let output = process
     .args(splitted_command.as_slice())
     .output()
-    .map_err(|error| format!("An error occurred process command: {}.\n{:?}", command, error))?;
+    .map_err(|error| {
+      format!(
+        "An error occurred process command: {}.\n{:?}",
+        command, error
+      )
+    })?;
 
   Ok(String::from_utf8(output.stdout).unwrap_or_default())
 }
@@ -100,8 +117,14 @@ pub fn test_compile_command_template_with_fixed_params() {
   let mut parameters = HashMap::new();
   parameters.insert("option".to_string(), "-l".to_string());
   parameters.insert("path".to_string(), ".".to_string());
-  parameters.insert(COMMAND_TEMPLATE_PARAM_ID.to_string(), command_template.clone());
-  parameters.insert(EXEC_DIR_PARAM_ID.to_string(), "/path/to/somewhere".to_string());
+  parameters.insert(
+    COMMAND_TEMPLATE_PARAM_ID.to_string(),
+    command_template.clone(),
+  );
+  parameters.insert(
+    EXEC_DIR_PARAM_ID.to_string(),
+    "/path/to/somewhere".to_string(),
+  );
 
   let command = compile_command_template(command_template, parameters);
   assert_eq!("ls -l .", command.as_str());
