@@ -5,10 +5,10 @@ use std::process::Command;
 use amqp_worker::job::*;
 use amqp_worker::MessageError;
 
-const COMMAND_TEMPLATE_PARAM_ID: &'static str = "command_template";
-const EXEC_DIR_PARAM_ID: &'static str = "exec_dir";
+const COMMAND_TEMPLATE_PARAM_ID: &str = "command_template";
+const EXEC_DIR_PARAM_ID: &str = "exec_dir";
 
-const INTERNAL_PARAM_IDS: [&'static str; 2] = [
+const INTERNAL_PARAM_IDS: [&str; 2] = [
   COMMAND_TEMPLATE_PARAM_ID,
   EXEC_DIR_PARAM_ID
 ];
@@ -20,13 +20,13 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
 
   let exec_dir = job.get_string_parameter(EXEC_DIR_PARAM_ID);
   let command_template = job.get_string_parameter(COMMAND_TEMPLATE_PARAM_ID)
-    .ok_or(MessageError::ProcessingError(
+    .ok_or_else(|| MessageError::ProcessingError(
       JobResult::from(&job)
         .with_status(JobStatus::Error)
         .with_message(format!("Invalid job message: missing expected '{}' parameter.", COMMAND_TEMPLATE_PARAM_ID))
     ))?;
 
-  let param_map: HashMap<String, Option<String>> = job.get_parameters_as_map();
+  let param_map = job.get_parameters_as_map();
   let command = compile_command_template(command_template, param_map);
 
   let result = launch(command, exec_dir)
@@ -41,31 +41,31 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   Ok(JobResult::from(job).with_status(JobStatus::Completed).with_message(result))
 }
 
-fn compile_command_template(command_template: String, param_map: HashMap<String, Option<String>>) -> String {
+fn compile_command_template(command_template: String, param_map: HashMap<String, String>) -> String {
   let mut compiled_command_template = command_template;
   param_map.iter()
     .filter(|(key, _value)| !INTERNAL_PARAM_IDS.contains(&key.as_str()))
-    .filter(|(_key, value)| value.is_some())
     .for_each(|(key, value)|
-      if let Some(v) = value {
-        compiled_command_template = compiled_command_template.replace(&format!("{{{}}}", key), v.as_str())
-      }
+      compiled_command_template = compiled_command_template.replace(&format!("{{{}}}", key), value)
     );
   compiled_command_template
 }
 
 fn launch(command: String, exec_dir: Option<String>) -> Result<String, String> {
-  let mut command_elems: Vec<&str> = command.split(" ").collect();
-  let program = command_elems.remove(0);
+  let mut splitted_command: Vec<&str> = command.split(' ').collect();
+  if splitted_command.is_empty() {
+    return Err("missing executable in the command line template".to_string());
+  }
+  let program = splitted_command.remove(0);
 
   let mut process = Command::new(program);
 
   if let Some(current_dir) = exec_dir {
-    process.current_dir(Path::new(current_dir.as_str()));
+    process.current_dir(Path::new(&current_dir));
   }
 
   let output = process
-    .args(command_elems.as_slice())
+    .args(splitted_command.as_slice())
     .output()
     .map_err(|error| format!("An error occurred process command: {}.\n{:?}", command, error))?;
 
@@ -76,8 +76,8 @@ fn launch(command: String, exec_dir: Option<String>) -> Result<String, String> {
 pub fn test_compile_command_template() {
   let command_template = "ls {option} {path}".to_string();
   let mut parameters = HashMap::new();
-  parameters.insert("option".to_string(), Some("-l".to_string()));
-  parameters.insert("path".to_string(), Some(".".to_string()));
+  parameters.insert("option".to_string(), "-l".to_string());
+  parameters.insert("path".to_string(), ".".to_string());
 
   let command = compile_command_template(command_template, parameters);
   assert_eq!("ls -l .", command.as_str());
@@ -87,8 +87,8 @@ pub fn test_compile_command_template() {
 pub fn test_compile_command_template_with_doubles() {
   let command_template = "ls {option} {path} {option}".to_string();
   let mut parameters = HashMap::new();
-  parameters.insert("option".to_string(), Some("-l".to_string()));
-  parameters.insert("path".to_string(), Some(".".to_string()));
+  parameters.insert("option".to_string(), "-l".to_string());
+  parameters.insert("path".to_string(), ".".to_string());
 
   let command = compile_command_template(command_template, parameters);
   assert_eq!("ls -l . -l", command.as_str());
@@ -98,10 +98,10 @@ pub fn test_compile_command_template_with_doubles() {
 pub fn test_compile_command_template_with_fixed_params() {
   let command_template = "ls {option} {path}".to_string();
   let mut parameters = HashMap::new();
-  parameters.insert("option".to_string(), Some("-l".to_string()));
-  parameters.insert("path".to_string(), Some(".".to_string()));
-  parameters.insert(COMMAND_TEMPLATE_PARAM_ID.to_string(), Some(command_template.clone()));
-  parameters.insert(EXEC_DIR_PARAM_ID.to_string(), Some("/path/to/somewhere".to_string()));
+  parameters.insert("option".to_string(), "-l".to_string());
+  parameters.insert("path".to_string(), ".".to_string());
+  parameters.insert(COMMAND_TEMPLATE_PARAM_ID.to_string(), command_template.clone());
+  parameters.insert(EXEC_DIR_PARAM_ID.to_string(), "/path/to/somewhere".to_string());
 
   let command = compile_command_template(command_template, parameters);
   assert_eq!("ls -l .", command.as_str());
