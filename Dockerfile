@@ -12,5 +12,5 @@ COPY --from=builder /usr/local/cargo/bin/command_line_worker /usr/bin
 
 RUN apt update && apt install -y libssl1.1 ca-certificates
 
-ENV AMQP_QUEUE job_ftp
+ENV AMQP_QUEUE job_command_line
 CMD command_line_worker
