@@ -34,13 +34,16 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let param_map = job.get_parameters_as_map();
   let command = compile_command_template(command_template, param_map);
 
-  let result = launch(command, exec_dir).map_err(|msg| {
+  let mut result = launch(command, exec_dir).map_err(|msg| {
     MessageError::ProcessingError(
       JobResult::from(&job)
         .with_status(JobStatus::Error)
         .with_message(msg),
     )
   })?;
+
+  // limit return message size to 1MB
+  result.truncate(1024 * 1024);
 
   Ok(
     JobResult::from(job)
@@ -86,7 +89,13 @@ fn launch(command: String, exec_dir: Option<String>) -> Result<String, String> {
       )
     })?;
 
-  Ok(String::from_utf8(output.stdout).unwrap_or_default())
+  if output.status.success() {
+    Ok(String::from_utf8(output.stdout).unwrap_or_default())
+  } else {
+    let mut message = output.stderr;
+    message.extend(&output.stdout);
+    Err(String::from_utf8(message).unwrap_or_default())
+  }
 }
 
 #[test]
@@ -155,6 +164,18 @@ pub fn test_launch_with_exec_dir() {
 }
 
 #[test]
+pub fn test_launch_error() {
+  let command = "ls sdjqenfdcnekbnbsdvjhqr".to_string();
+  let exec_dir = None;
+  let result = launch(command, exec_dir);
+  assert!(result.is_err());
+
+  let error_message = result.unwrap_err();
+  assert!(error_message.contains("ls:"));
+  assert!(error_message.contains("sdjqenfdcnekbnbsdvjhqr"));
+}
+
+#[test]
 pub fn test_process() {
   let message = r#"{
     "job_id": 123,
@@ -191,3 +212,37 @@ pub fn test_process() {
   assert!(message_param.is_some());
   assert!(message_param.unwrap().contains("main.rs"));
 }
+
+#[test]
+pub fn test_process_with_error() {
+  let message = r#"{
+    "job_id": 123,
+    "parameters": [
+      {
+        "id": "command_template",
+        "type": "string",
+        "value": "ls {option} {path}"
+      },
+      {
+        "id": "option",
+        "type": "string",
+        "value": "-lh"
+      },
+      {
+        "id": "path",
+        "type": "string",
+        "value": "qmslkjggsdlvnqrdgwdnvqrgn"
+      },
+      {
+        "id": "exec_dir",
+        "type": "string",
+        "value": "./src"
+      }
+    ]
+  }"#;
+
+  let result = process(message);
+  assert!(result.is_err());
+  let _error = result.unwrap_err();
+}
+
