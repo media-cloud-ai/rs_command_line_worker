@@ -34,13 +34,16 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   let param_map = job.get_parameters_as_map();
   let command = compile_command_template(command_template, param_map);
 
-  let result = launch(command, exec_dir).map_err(|msg| {
+  let mut result = launch(command, exec_dir).map_err(|msg| {
     MessageError::ProcessingError(
       JobResult::from(&job)
         .with_status(JobStatus::Error)
         .with_message(msg),
     )
   })?;
+
+  // limit return message size to 1MB
+  result.truncate(1024 * 1024);
 
   Ok(
     JobResult::from(job)
