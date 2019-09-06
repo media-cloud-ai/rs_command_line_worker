@@ -245,4 +245,3 @@ pub fn test_process_with_error() {
   assert!(result.is_err());
   let _error = result.unwrap_err();
 }
-
