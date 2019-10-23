@@ -69,7 +69,7 @@ dependencies = [
 
 [[package]]
 name = "amqp_worker"
-version = "0.5.8"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "amq-protocol-types 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -81,6 +81,7 @@ dependencies = [
  "lapin-futures 0.25.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.9.19 (registry+https://github.com/rust-lang/crates.io-index)",
+ "semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -223,8 +224,9 @@ dependencies = [
 name = "command_line_worker"
 version = "0.1.0"
 dependencies = [
- "amqp_worker 0.5.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "amqp_worker 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1330,6 +1332,7 @@ version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1887,7 +1890,7 @@ dependencies = [
 "checksum amq-protocol-tcp 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "af951a914fde73cfb776b1080f1f51c08ca9a3fe11fc607851fc536e3d1de6c7"
 "checksum amq-protocol-types 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "25b297ed79bc12190f3d873d893f640f356a528c48d3f0add28a2b6caa1dcba1"
 "checksum amq-protocol-uri 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "164b17095b54a6018419cc502e7f0285c75c1b68081240f447bcf5b4d7b88a2a"
-"checksum amqp_worker 0.5.8 (registry+https://github.com/rust-lang/crates.io-index)" = "fe4fd980f6f1d9b3d636e190fa558133ff14e13bf01143013adabb3e1c31fc27"
+"checksum amqp_worker 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "41bc749b5c1307124bfd71fda13a0ee83884dc942838d96f70e9a38df1871b0b"
 "checksum arrayvec 0.4.11 (registry+https://github.com/rust-lang/crates.io-index)" = "b8d73f9beda665eaa98ab9e4f7442bd4e7de6652587de55b2525e52e29c1b0ba"
 "checksum atty 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)" = "1803c647a3ec87095e7ae7acfca019e98de5ec9a7d01343f611cf3152ed71a90"
 "checksum autocfg 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "b671c8fb71b457dd4ae18c4ba1e59aa81793daacc361d82fcd410cef0d491875"

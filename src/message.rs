@@ -3,8 +3,9 @@ use std::path::Path;
 use std::process::Command;
 
 use amqp_worker::{
-  job::{Job, JobResult, JobStatus, ParametersContainer},
+  job::{Job, JobResult, JobStatus},
   MessageError,
+  ParametersContainer,
 };
 
 const COMMAND_TEMPLATE_PARAM_ID: &str = "command_template";
