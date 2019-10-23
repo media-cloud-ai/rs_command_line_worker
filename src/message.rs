@@ -4,8 +4,7 @@ use std::process::Command;
 
 use amqp_worker::{
   job::{Job, JobResult, JobStatus},
-  MessageError,
-  ParametersContainer,
+  MessageError, ParametersContainer,
 };
 
 const COMMAND_TEMPLATE_PARAM_ID: &str = "command_template";

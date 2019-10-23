@@ -3,16 +3,16 @@ extern crate amqp_worker;
 extern crate log;
 extern crate semver;
 
-use amqp_worker::{job::JobResult, start_worker, MessageError, MessageEvent};
 use amqp_worker::worker::{Parameter, ParameterType};
+use amqp_worker::{job::JobResult, start_worker, MessageError, MessageEvent};
 use semver::Version;
 
 mod message;
 
 macro_rules! crate_version {
-    () => {
-        env!("CARGO_PKG_VERSION")
-    };
+  () => {
+    env!("CARGO_PKG_VERSION")
+  };
 }
 
 #[derive(Debug)]
@@ -29,7 +29,8 @@ impl MessageEvent for CommandLineEvent {
 
   fn get_description(&self) -> String {
     r#"Run any command line available in the command line of the worker.
-Provide a template parameter, other parameters will be replaced before running."#.to_string()
+Provide a template parameter, other parameters will be replaced before running."#
+      .to_string()
   }
 
   fn get_version(&self) -> Version {
@@ -53,7 +54,7 @@ Provide a template parameter, other parameters will be replaced before running."
         label: "Execution directory".to_string(),
         kind: vec![ParameterType::String],
         required: true,
-      }
+      },
     ]
   }
 
