@@ -206,8 +206,8 @@ pub fn test_process() {
   let result = process(message);
   assert!(result.is_ok());
   let job_result = result.unwrap();
-  assert_eq!(123, job_result.job_id);
-  assert_eq!(JobStatus::Completed, job_result.status);
+  assert_eq!(123, job_result.get_job_id());
+  assert_eq!(&JobStatus::Completed, job_result.get_status());
   let message_param = job_result.get_string_parameter("message");
   assert!(message_param.is_some());
   assert!(message_param.unwrap().contains("main.rs"));
