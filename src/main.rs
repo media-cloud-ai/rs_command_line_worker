@@ -1,7 +1,5 @@
-extern crate amqp_worker;
 #[macro_use]
 extern crate log;
-extern crate semver;
 
 use amqp_worker::worker::{Parameter, ParameterType};
 use amqp_worker::{job::JobResult, start_worker, MessageError, MessageEvent};
@@ -34,10 +32,6 @@ Provide a template parameter, other parameters will be replaced before running."
   }
 
   fn get_version(&self) -> Version {
-    semver::Version::parse(crate_version!()).expect("unable to locate Package version")
-  }
-
-  fn get_git_version(&self) -> Version {
     semver::Version::parse(crate_version!()).expect("unable to locate Package version")
   }
 

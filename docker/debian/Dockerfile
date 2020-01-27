@@ -1,4 +1,4 @@
-FROM rust:1.37-buster as builder
+FROM rust:1.40-buster as builder
 
 ADD . ./
 
