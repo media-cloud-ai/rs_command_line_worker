@@ -37,10 +37,6 @@ Provide a template parameter, other parameters will be replaced before running."
     semver::Version::parse(crate_version!()).expect("unable to locate Package version")
   }
 
-  fn get_git_version(&self) -> Version {
-    semver::Version::parse(crate_version!()).expect("unable to locate Package version")
-  }
-
   fn get_parameters(&self) -> Vec<Parameter> {
     vec![
       Parameter {

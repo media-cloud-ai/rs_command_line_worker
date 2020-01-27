@@ -24,7 +24,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
       MessageError::ProcessingError(
         JobResult::from(&job)
           .with_status(JobStatus::Error)
-          .with_message(format!(
+          .with_message(&format!(
             "Invalid job message: missing expected '{}' parameter.",
             COMMAND_TEMPLATE_PARAM_ID
           )),
@@ -38,7 +38,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
     MessageError::ProcessingError(
       JobResult::from(&job)
         .with_status(JobStatus::Error)
-        .with_message(msg),
+        .with_message(&msg),
     )
   })?;
 
@@ -48,7 +48,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   Ok(
     JobResult::from(job)
       .with_status(JobStatus::Completed)
-      .with_message(result),
+      .with_message(&result),
   )
 }
 
