@@ -1,7 +1,5 @@
-extern crate amqp_worker;
 #[macro_use]
 extern crate log;
-extern crate semver;
 
 use amqp_worker::worker::{Parameter, ParameterType};
 use amqp_worker::{job::JobResult, start_worker, MessageError, MessageEvent};
