@@ -1,32 +1,29 @@
-use std::collections::HashMap;
-use std::path::Path;
-use std::process::Command;
 
 use amqp_worker::{
   job::{Job, JobResult, JobStatus},
   MessageError, ParametersContainer,
 };
+use lapin_futures::Channel;
+use std::collections::HashMap;
+use std::path::Path;
+use std::process::Command;
 
-const COMMAND_TEMPLATE_PARAM_ID: &str = "command_template";
-const EXEC_DIR_PARAM_ID: &str = "exec_dir";
+const COMMAND_TEMPLATE_IDENTIFIER: &str = "command_template";
+const EXECUTION_DIRECTORY_PARAMETER: &str = "exec_dir";
 
-const INTERNAL_PARAM_IDS: [&str; 2] = [COMMAND_TEMPLATE_PARAM_ID, EXEC_DIR_PARAM_ID];
+const INTERNAL_PARAM_IDENTIFIERS: [&str; 2] = [COMMAND_TEMPLATE_IDENTIFIER, EXECUTION_DIRECTORY_PARAMETER];
 
-pub fn process(message: &str) -> Result<JobResult, MessageError> {
-  let job = Job::new(message)?;
-  debug!("Received message: {:?}", job);
-  job.check_requirements()?;
-
-  let exec_dir = job.get_string_parameter(EXEC_DIR_PARAM_ID);
+pub fn process(_channel: Option<&Channel>, job: &Job, job_result: JobResult) -> Result<JobResult, MessageError> {
+  let exec_dir = job.get_string_parameter(EXECUTION_DIRECTORY_PARAMETER);
   let command_template = job
-    .get_string_parameter(COMMAND_TEMPLATE_PARAM_ID)
+    .get_string_parameter(COMMAND_TEMPLATE_IDENTIFIER)
     .ok_or_else(|| {
       MessageError::ProcessingError(
-        JobResult::from(&job)
+        job_result.clone()
           .with_status(JobStatus::Error)
           .with_message(&format!(
             "Invalid job message: missing expected '{}' parameter.",
-            COMMAND_TEMPLATE_PARAM_ID
+            COMMAND_TEMPLATE_IDENTIFIER
           )),
       )
     })?;
@@ -36,7 +33,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
 
   let mut result = launch(command, exec_dir).map_err(|msg| {
     MessageError::ProcessingError(
-      JobResult::from(&job)
+      job_result.clone()
         .with_status(JobStatus::Error)
         .with_message(&msg),
     )
@@ -46,7 +43,7 @@ pub fn process(message: &str) -> Result<JobResult, MessageError> {
   result.truncate(1024 * 1024);
 
   Ok(
-    JobResult::from(job)
+    job_result
       .with_status(JobStatus::Completed)
       .with_message(&result),
   )
@@ -59,7 +56,7 @@ fn compile_command_template(
   let mut compiled_command_template = command_template;
   param_map
     .iter()
-    .filter(|(key, _value)| !INTERNAL_PARAM_IDS.contains(&key.as_str()))
+    .filter(|(key, _value)| !INTERNAL_PARAM_IDENTIFIERS.contains(&key.as_str()))
     .for_each(|(key, value)| {
       compiled_command_template = compiled_command_template.replace(&format!("{{{}}}", key), value)
     });
@@ -127,11 +124,11 @@ pub fn test_compile_command_template_with_fixed_params() {
   parameters.insert("option".to_string(), "-l".to_string());
   parameters.insert("path".to_string(), ".".to_string());
   parameters.insert(
-    COMMAND_TEMPLATE_PARAM_ID.to_string(),
+    COMMAND_TEMPLATE_IDENTIFIER.to_string(),
     command_template.clone(),
   );
   parameters.insert(
-    EXEC_DIR_PARAM_ID.to_string(),
+    EXECUTION_DIRECTORY_PARAMETER.to_string(),
     "/path/to/somewhere".to_string(),
   );
 

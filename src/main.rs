@@ -1,8 +1,7 @@
-#[macro_use]
-extern crate log;
 
 use amqp_worker::worker::{Parameter, ParameterType};
-use amqp_worker::{job::JobResult, start_worker, MessageError, MessageEvent};
+use amqp_worker::{job::{Job, JobResult}, start_worker, MessageError, MessageEvent};
+use lapin_futures::Channel;
 use semver::Version;
 
 mod message;
@@ -52,8 +51,13 @@ Provide a template parameter, other parameters will be replaced before running."
     ]
   }
 
-  fn process(&self, message: &str) -> Result<JobResult, MessageError> {
-    message::process(message)
+  fn process(
+    &self,
+    channel: Option<&Channel>,
+    job: &Job,
+    job_result: JobResult
+    ) -> Result<JobResult, MessageError> {
+    message::process(channel, job, job_result)
   }
 }
 
