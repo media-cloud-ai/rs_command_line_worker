@@ -1,9 +1,9 @@
 
-use amqp_worker::{
+use mcai_worker_sdk::{
   job::{Job, JobResult, JobStatus},
+  McaiChannel,
   MessageError, ParametersContainer,
 };
-use lapin_futures::Channel;
 use std::collections::HashMap;
 use std::path::Path;
 use std::process::Command;
@@ -13,7 +13,7 @@ const EXECUTION_DIRECTORY_PARAMETER: &str = "exec_dir";
 
 const INTERNAL_PARAM_IDENTIFIERS: [&str; 2] = [COMMAND_TEMPLATE_IDENTIFIER, EXECUTION_DIRECTORY_PARAMETER];
 
-pub fn process(_channel: Option<&Channel>, job: &Job, job_result: JobResult) -> Result<JobResult, MessageError> {
+pub fn process(_channel: Option<McaiChannel>, job: &Job, job_result: JobResult) -> Result<JobResult, MessageError> {
   let exec_dir = job.get_string_parameter(EXECUTION_DIRECTORY_PARAMETER);
   let command_template = job
     .get_string_parameter(COMMAND_TEMPLATE_IDENTIFIER)
@@ -200,7 +200,10 @@ pub fn test_process() {
     ]
   }"#;
 
-  let result = process(message);
+  let job = Job::new(message).unwrap();
+  let job_result = JobResult::new(job.job_id);
+  let result = process(None, &job, job_result);
+
   assert!(result.is_ok());
   let job_result = result.unwrap();
   assert_eq!(123, job_result.get_job_id());
@@ -238,7 +241,10 @@ pub fn test_process_with_error() {
     ]
   }"#;
 
-  let result = process(message);
+  let job = Job::new(message).unwrap();
+  let job_result = JobResult::new(job.job_id);
+  let result = process(None, &job, job_result);
+
   assert!(result.is_err());
   let _error = result.unwrap_err();
 }
