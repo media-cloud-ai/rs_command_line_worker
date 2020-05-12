@@ -1,0 +1,10 @@
+{
+	"job_id": 1234,
+	"parameters": [
+		{
+			"id": "command_template",
+			"type": "string",
+			"value": "whoami"
+		}
+	]
+}

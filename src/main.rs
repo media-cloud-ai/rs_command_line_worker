@@ -1,15 +1,14 @@
-
-use amqp_worker::worker::{Parameter, ParameterType};
-use amqp_worker::{job::{Job, JobResult}, start_worker, MessageError, MessageEvent};
-use lapin_futures::Channel;
-use semver::Version;
+use mcai_worker_sdk::{
+  job::{Job, JobResult},
+  start_worker,
+  worker::{Parameter, ParameterType},
+  McaiChannel, MessageError, MessageEvent, Version,
+};
 
 mod message;
 
-macro_rules! crate_version {
-  () => {
-    env!("CARGO_PKG_VERSION")
-  };
+pub mod built_info {
+  include!(concat!(env!("OUT_DIR"), "/built.rs"));
 }
 
 #[derive(Debug)]
@@ -31,7 +30,7 @@ Provide a template parameter, other parameters will be replaced before running."
   }
 
   fn get_version(&self) -> Version {
-    semver::Version::parse(crate_version!()).expect("unable to locate Package version")
+    Version::parse(built_info::PKG_VERSION).expect("unable to locate Package version")
   }
 
   fn get_parameters(&self) -> Vec<Parameter> {
@@ -53,10 +52,10 @@ Provide a template parameter, other parameters will be replaced before running."
 
   fn process(
     &self,
-    channel: Option<&Channel>,
+    channel: Option<McaiChannel>,
     job: &Job,
-    job_result: JobResult
-    ) -> Result<JobResult, MessageError> {
+    job_result: JobResult,
+  ) -> Result<JobResult, MessageError> {
     message::process(channel, job, job_result)
   }
 }
