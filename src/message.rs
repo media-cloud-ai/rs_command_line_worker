@@ -1,8 +1,6 @@
-
 use mcai_worker_sdk::{
   job::{Job, JobResult, JobStatus},
-  McaiChannel,
-  MessageError, ParametersContainer,
+  McaiChannel, MessageError, ParametersContainer,
 };
 use std::collections::HashMap;
 use std::path::Path;
@@ -11,15 +9,21 @@ use std::process::Command;
 const COMMAND_TEMPLATE_IDENTIFIER: &str = "command_template";
 const EXECUTION_DIRECTORY_PARAMETER: &str = "exec_dir";
 
-const INTERNAL_PARAM_IDENTIFIERS: [&str; 2] = [COMMAND_TEMPLATE_IDENTIFIER, EXECUTION_DIRECTORY_PARAMETER];
+const INTERNAL_PARAM_IDENTIFIERS: [&str; 2] =
+  [COMMAND_TEMPLATE_IDENTIFIER, EXECUTION_DIRECTORY_PARAMETER];
 
-pub fn process(_channel: Option<McaiChannel>, job: &Job, job_result: JobResult) -> Result<JobResult, MessageError> {
+pub fn process(
+  _channel: Option<McaiChannel>,
+  job: &Job,
+  job_result: JobResult,
+) -> Result<JobResult, MessageError> {
   let exec_dir = job.get_string_parameter(EXECUTION_DIRECTORY_PARAMETER);
   let command_template = job
     .get_string_parameter(COMMAND_TEMPLATE_IDENTIFIER)
     .ok_or_else(|| {
       MessageError::ProcessingError(
-        job_result.clone()
+        job_result
+          .clone()
           .with_status(JobStatus::Error)
           .with_message(&format!(
             "Invalid job message: missing expected '{}' parameter.",
@@ -33,7 +37,8 @@ pub fn process(_channel: Option<McaiChannel>, job: &Job, job_result: JobResult) 
 
   let mut result = launch(command, exec_dir).map_err(|msg| {
     MessageError::ProcessingError(
-      job_result.clone()
+      job_result
+        .clone()
         .with_status(JobStatus::Error)
         .with_message(&msg),
     )

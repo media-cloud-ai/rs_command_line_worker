@@ -1,16 +1,11 @@
-
 use mcai_worker_sdk::{
   job::{Job, JobResult},
   start_worker,
   worker::{Parameter, ParameterType},
-  McaiChannel,
-  MessageError,
-  MessageEvent,
-  Version,
+  McaiChannel, MessageError, MessageEvent, Version,
 };
 
 mod message;
-
 
 pub mod built_info {
   include!(concat!(env!("OUT_DIR"), "/built.rs"));
@@ -59,8 +54,8 @@ Provide a template parameter, other parameters will be replaced before running."
     &self,
     channel: Option<McaiChannel>,
     job: &Job,
-    job_result: JobResult
-    ) -> Result<JobResult, MessageError> {
+    job_result: JobResult,
+  ) -> Result<JobResult, MessageError> {
     message::process(channel, job, job_result)
   }
 }
