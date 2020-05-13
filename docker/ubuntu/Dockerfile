@@ -23,7 +23,9 @@ FROM ubuntu:18.04 AS worker_builder
 
 COPY --from=rust_builder /dist/ /usr/local/
 
-ADD . ./
+ADD . /app
+
+WORKDIR /app
 
 RUN apt-get update && \
     apt-get install \
