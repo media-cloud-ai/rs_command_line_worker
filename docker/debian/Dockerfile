@@ -1,6 +1,8 @@
 FROM rust:1.43-buster as builder
 
-ADD . ./
+ADD . /app
+
+WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y libssl-dev && \
