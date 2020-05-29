@@ -11,9 +11,9 @@ dependencies = [
 
 [[package]]
 name = "amq-protocol"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc2af3b0b15738172334d196a3b98e651fcdbbcecf2069138f5bbedf400a3d6d"
+checksum = "5049eec5bcf5309f7609f760178ad6ef7729af8584d4e3539a6987c10243a588"
 dependencies = [
  "amq-protocol-codegen",
  "amq-protocol-tcp",
@@ -25,9 +25,9 @@ dependencies = [
 
 [[package]]
 name = "amq-protocol-codegen"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3f2c370a138e85cec1656cb741de76ca80cf25c9a63f5bf611a7af6152315f2"
+checksum = "bdda13f583b5f45525912851b23313ef8fb853172df8cb9c2d3bfc456f467efd"
 dependencies = [
  "amq-protocol-types",
  "handlebars",
@@ -37,9 +37,9 @@ dependencies = [
 
 [[package]]
 name = "amq-protocol-tcp"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc78407975f9b9cb73d01abf84996a54a64058493c147ba6c2bd3149df0937f7"
+checksum = "288c2c1c2c421f1f67dae9f374bbf622c6c13936cfe465832e6c3f76991d99fb"
 dependencies = [
  "amq-protocol-uri",
  "log",
@@ -48,9 +48,9 @@ dependencies = [
 
 [[package]]
 name = "amq-protocol-types"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4425e82ba6069abf1132abae0395dd2d59bc0f5bd25b4001208dbfa7701f135f"
+checksum = "fb4e74d4e1511f7f4a568e57dea3d8164d268bf68624a08cc4ac29b3ee57c044"
 dependencies = [
  "cookie-factory",
  "nom",
@@ -60,9 +60,9 @@ dependencies = [
 
 [[package]]
 name = "amq-protocol-uri"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9551b95be48c02825f0944eb45b372112e2ac4f76e1ab684c8bc789e62d8a7e4"
+checksum = "a18f95688383edd826299d527ec3de1cd00975e00da2cd78b6d3c35ddd7caa15"
 dependencies = [
  "percent-encoding",
  "url",
@@ -699,9 +699,9 @@ dependencies = [
 
 [[package]]
 name = "lapin"
-version = "1.0.0-beta4"
+version = "1.0.0-rc1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "daceedfb02915683f986b8860f3ed65530e8a33fcc77b3a0f52dffeb08e482c3"
+checksum = "031fa719b4e59a343bbe7f039a56ea12d155cc202084f353fe7b221a93273151"
 dependencies = [
  "amq-protocol",
  "amq-protocol-codegen",
@@ -778,9 +778,9 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 
 [[package]]
 name = "mcai_worker_sdk"
-version = "0.10.2"
+version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4d87eba62c18b868638d25938b3eb4fe8112dbde8d9ba65d169d92a4703e0ef"
+checksum = "ba5b8fbacbf13515b66285fee8dfaa8c89e8bc0bee491ff770e602352ff5a376"
 dependencies = [
  "amq-protocol",
  "amq-protocol-types",
@@ -1035,6 +1035,17 @@ dependencies = [
  "redox_syscall",
  "smallvec",
  "winapi 0.3.8",
+]
+
+[[package]]
+name = "pem"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1581760c757a756a41f0ee3ff01256227bdf64cb752839779b95ffb01c59793"
+dependencies = [
+ "base64",
+ "lazy_static",
+ "regex",
 ]
 
 [[package]]
@@ -1503,13 +1514,14 @@ dependencies = [
 
 [[package]]
 name = "tcp-stream"
-version = "0.15.4"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cffaa277f6a7eae762f9ba79da149e239e1940b392d6dd32c1cd3bb27ca6d9dd"
+checksum = "a5be33c17aabb3f250944cb4191d204634ef3c2377024230a71a5d8eeff0a872"
 dependencies = [
  "cfg-if",
  "mio 0.7.0",
  "native-tls",
+ "pem",
 ]
 
 [[package]]
