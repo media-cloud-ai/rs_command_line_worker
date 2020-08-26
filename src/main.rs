@@ -1,9 +1,12 @@
+#[macro_use]
+extern crate serde_derive;
+
+use std::collections::HashMap;
+
 use mcai_worker_sdk::{
-  job::{Job, JobResult},
-  start_worker,
-  worker::{Parameter, ParameterType},
-  McaiChannel, MessageError, MessageEvent, Version,
+  job::JobResult, start_worker, McaiChannel, MessageError, MessageEvent, Version,
 };
+use schemars::JsonSchema;
 
 mod message;
 
@@ -11,10 +14,18 @@ pub mod built_info {
   include!(concat!(env!("OUT_DIR"), "/built.rs"));
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct CommandLineEvent {}
 
-impl MessageEvent for CommandLineEvent {
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct CommandLineWorkerParameters {
+  command_template: String,
+  exec_dir: Option<String>,
+  #[serde(flatten)]
+  parameters: HashMap<String, String>,
+}
+
+impl MessageEvent<CommandLineWorkerParameters> for CommandLineEvent {
   fn get_name(&self) -> String {
     "Command Line".to_string()
   }
@@ -33,35 +44,17 @@ Provide a template parameter, other parameters will be replaced before running."
     Version::parse(built_info::PKG_VERSION).expect("unable to locate Package version")
   }
 
-  fn get_parameters(&self) -> Vec<Parameter> {
-    vec![
-      Parameter {
-        identifier: "command_template".to_string(),
-        label: "Command Template".to_string(),
-        kind: vec![ParameterType::String],
-        required: true,
-      },
-      Parameter {
-        identifier: "exec_dir".to_string(),
-        label: "Execution directory".to_string(),
-        kind: vec![ParameterType::String],
-        required: true,
-      },
-    ]
-  }
-
   fn process(
     &self,
     channel: Option<McaiChannel>,
-    job: &Job,
+    parameters: CommandLineWorkerParameters,
     job_result: JobResult,
   ) -> Result<JobResult, MessageError> {
-    message::process(channel, job, job_result)
+    message::process(channel, parameters, job_result)
   }
 }
 
-static COMMAND_LINE_EVENT: CommandLineEvent = CommandLineEvent {};
-
 fn main() {
-  start_worker(&COMMAND_LINE_EVENT);
+  let message_event = CommandLineEvent::default();
+  start_worker(message_event);
 }
