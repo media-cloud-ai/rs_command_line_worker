@@ -23,6 +23,7 @@ pub struct CommandLineWorkerParameters {
   exec_dir: Option<String>,
   #[serde(flatten)]
   parameters: HashMap<String, String>,
+  requirements: Option<HashMap<String, Vec<String>>>,
 }
 
 impl MessageEvent<CommandLineWorkerParameters> for CommandLineEvent {

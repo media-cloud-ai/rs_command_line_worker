@@ -1,0 +1,24 @@
+{
+  "job_id": 13,
+  "parameters": [
+    {
+      "id": "command_template",
+      "type": "string",
+      "value": "cat {source_path}"
+    },
+    {
+      "id": "source_path",
+      "type": "string",
+      "value": "./README.md"
+    },
+    {
+      "id": "requirements",
+      "type": "requirements",
+      "value": {
+        "paths": [
+          "./README.md"
+        ]
+      }
+    }
+  ]
+}
