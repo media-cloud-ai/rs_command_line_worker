@@ -208,6 +208,60 @@ pub fn test_process() {
 }
 
 #[test]
+pub fn test_process_with_requirements() {
+  use mcai_worker_sdk::job::Job;
+  use mcai_worker_sdk::ParametersContainer;
+
+  let message = r#"{
+    "job_id": 123,
+    "parameters": [
+      {
+        "id": "command_template",
+        "type": "string",
+        "value": "ls {option} {path}"
+      },
+      {
+        "id": "option",
+        "type": "string",
+        "value": "-lh"
+      },
+      {
+        "id": "path",
+        "type": "string",
+        "value": "."
+      },
+      {
+        "id": "exec_dir",
+        "type": "string",
+        "value": "./src"
+      },
+      {
+        "id": "requirements",
+        "type": "requirements",
+        "value": {
+          "paths": [
+            "./src"
+          ]
+        }
+      }
+    ]
+  }"#;
+
+  let job = Job::new(message).unwrap();
+  let job_result = JobResult::new(job.job_id);
+  let parameters: CommandLineWorkerParameters = job.get_parameters().unwrap();
+  let result = process(None, parameters, job_result);
+
+  assert!(result.is_ok());
+  let job_result = result.unwrap();
+  assert_eq!(123, job_result.get_job_id());
+  assert_eq!(&JobStatus::Completed, job_result.get_status());
+  let message_param = job_result.get_parameter::<String>("message");
+  assert!(message_param.is_ok());
+  assert!(message_param.unwrap().contains("main.rs"));
+}
+
+#[test]
 pub fn test_process_with_error() {
   use mcai_worker_sdk::job::Job;
 
