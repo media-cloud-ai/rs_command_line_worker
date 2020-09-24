@@ -195,7 +195,7 @@ dependencies = [
 
 [[package]]
 name = "command_line_worker"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "built",
  "mcai_worker_sdk",
