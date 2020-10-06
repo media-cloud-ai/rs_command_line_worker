@@ -4,9 +4,8 @@ extern crate serde_derive;
 use std::collections::HashMap;
 
 use mcai_worker_sdk::{
-  job::JobResult, start_worker, McaiChannel, MessageError, MessageEvent, Version,
+  job::JobResult, start_worker, JsonSchema, McaiChannel, MessageError, MessageEvent, Version,
 };
-use schemars::JsonSchema;
 
 mod message;
 
