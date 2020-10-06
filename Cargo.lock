@@ -195,7 +195,7 @@ dependencies = [
 
 [[package]]
 name = "command_line_worker"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "built",
  "mcai_worker_sdk",
@@ -1424,9 +1424,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.57"
+version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "164eacbdb13512ec2745fb09d51fd5b22b0d65ed294a1dcf7285a360c80a675c"
+checksum = "a230ea9107ca2220eea9d46de97eddcb04cd00e92d13dda78e478dd33fa82bd4"
 dependencies = [
  "itoa",
  "ryu",
