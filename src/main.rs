@@ -23,6 +23,8 @@ pub struct CommandLineWorkerParameters {
   #[serde(flatten)]
   parameters: HashMap<String, String>,
   requirements: Option<HashMap<String, Vec<String>>>,
+  #[serde(default)]
+  source_paths: Vec<String>,
 }
 
 impl MessageEvent<CommandLineWorkerParameters> for CommandLineEvent {
