@@ -1,0 +1,28 @@
+{
+  "job_id": 1234,
+  "parameters": [
+    {
+      "id": "command_template",
+      "type": "string",
+      "value": "whoami"
+    },
+    {
+      "id": "source_paths",
+      "type": "array_of_strings",
+      "value": [
+        "./README.md",
+        "./Cargo.toml"
+      ]
+    },
+    {
+      "id": "requirements",
+      "type": "requirements",
+      "value": {
+        "paths": [
+          "./README.md",
+          "./Cargo.toml"
+        ]
+      }
+    }
+  ]
+}
