@@ -1,25 +1,25 @@
 {
-	"job_id": 1234,
-	"parameters": [
-		{
-			"id": "command_template",
-			"type": "string",
-			"value": "ls {option} {path}"
-		},
-		{
-			"id": "option",
-			"type": "string",
-			"value": "-lh"
-		},
-		{
-			"id": "path",
-			"type": "string",
-			"value": "."
-		},
-		{
-			"id": "exec_dir",
-			"type": "string",
-			"value": "./src"
-		}
-	]
+  "job_id": 1234,
+  "parameters": [
+    {
+      "id": "command_template",
+      "type": "string",
+      "value": "ls {option} {path}"
+    },
+    {
+      "id": "option",
+      "type": "string",
+      "value": "-lh"
+    },
+    {
+      "id": "path",
+      "type": "string",
+      "value": "."
+    },
+    {
+      "id": "exec_dir",
+      "type": "string",
+      "value": "./src"
+    }
+  ]
 }
