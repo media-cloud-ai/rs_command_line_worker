@@ -25,6 +25,8 @@ pub struct CommandLineWorkerParameters {
   requirements: Option<HashMap<String, Vec<String>>>,
   #[serde(default)]
   source_paths: Vec<String>,
+  #[serde(default)]
+  destination_paths: Vec<String>,
 }
 
 impl MessageEvent<CommandLineWorkerParameters> for CommandLineEvent {
