@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: schemars
+    versions:
+    - 0.8.2
+  - dependency-name: serde
+    versions:
+    - 1.0.124
+  - dependency-name: serde_json
+    versions:
+    - 1.0.62
